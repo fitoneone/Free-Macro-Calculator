@@ -1,15 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Calorie Calculator with Macros</title>
+  <title>Calorie & Macro Calculator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
+      background-color: #f7f9fc;
+      color: #333;
     }
     form {
-      max-width: 400px;
+      max-width: 500px;
       margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
     }
     label {
       display: block;
@@ -19,12 +25,13 @@
       width: 100%;
       padding: 10px;
       margin-top: 5px;
-      border: 1px solid #ccc;
+      border: 1px solid #ddd;
       border-radius: 5px;
     }
     button {
       background-color: #4CAF50;
       color: white;
+      font-weight: bold;
       border: none;
       cursor: pointer;
     }
@@ -37,17 +44,35 @@
     #result, #macros {
       font-weight: bold;
       color: #2e8b57;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>Calorie Calculator with Macros</h1>
+  <h1>Calorie & Macro Calculator</h1>
   <form id="calorieForm">
-    <label for="weight">Weight (kg):</label>
-    <input type="number" id="weight" required>
+    <label for="units">Units:</label>
+    <select id="units" onchange="toggleUnits()" required>
+      <option value="metric">Metric (kg, cm)</option>
+      <option value="imperial">Imperial (lbs, ft/in)</option>
+    </select>
 
-    <label for="height">Height (cm):</label>
-    <input type="number" id="height" required>
+    <div id="metric-inputs">
+      <label for="weight">Weight (kg):</label>
+      <input type="number" id="weightMetric" step="0.1">
+
+      <label for="height">Height (cm):</label>
+      <input type="number" id="heightMetric" step="0.1">
+    </div>
+
+    <div id="imperial-inputs" style="display: none;">
+      <label for="weight">Weight (lbs):</label>
+      <input type="number" id="weightImperial" step="0.1">
+
+      <label for="height">Height:</label>
+      <input type="number" id="heightFeet" placeholder="Feet" step="1">
+      <input type="number" id="heightInches" placeholder="Inches" step="0.1">
+    </div>
 
     <label for="age">Age (years):</label>
     <input type="number" id="age" required>
@@ -67,7 +92,14 @@
       <option value="1.9">Extra Active</option>
     </select>
 
-    <button type="button" onclick="calculateCalories()">Calculate</button>
+    <label for="goal">Goal:</label>
+    <select id="goal" required>
+      <option value="maintenance">Maintenance</option>
+      <option value="fat_loss">Fat Loss</option>
+      <option value="muscle_gain">Muscle Gain</option>
+    </select>
+
+    <button type="button" onclick="calculate()">Calculate</button>
   </form>
 
   <h2>Calories: <span id="result">-</span> kcal/day</h2>
@@ -75,12 +107,40 @@
   <p id="macros">Protein: - g, Carbs: - g, Fat: - g</p>
 
   <script>
-    function calculateCalories() {
-      const weight = parseFloat(document.getElementById('weight').value);
-      const height = parseFloat(document.getElementById('height').value);
+    function toggleUnits() {
+      const units = document.getElementById('units').value;
+      const metricInputs = document.getElementById('metric-inputs');
+      const imperialInputs = document.getElementById('imperial-inputs');
+
+      if (units === 'metric') {
+        metricInputs.style.display = 'block';
+        imperialInputs.style.display = 'none';
+      } else {
+        metricInputs.style.display = 'none';
+        imperialInputs.style.display = 'block';
+      }
+    }
+
+    function calculate() {
+      const units = document.getElementById('units').value;
+      let weight, height;
+
+      if (units === 'metric') {
+        weight = parseFloat(document.getElementById('weightMetric').value);
+        height = parseFloat(document.getElementById('heightMetric').value);
+      } else {
+        const weightImperial = parseFloat(document.getElementById('weightImperial').value);
+        const heightFeet = parseFloat(document.getElementById('heightFeet').value);
+        const heightInches = parseFloat(document.getElementById('heightInches').value);
+
+        weight = weightImperial * 0.453592; // Convert lbs to kg
+        height = (heightFeet * 30.48) + (heightInches * 2.54); // Convert ft/in to cm
+      }
+
       const age = parseInt(document.getElementById('age').value);
       const gender = document.getElementById('gender').value;
       const activity = parseFloat(document.getElementById('activity').value);
+      const goal = document.getElementById('goal').value;
 
       // Calculate BMR
       let bmr;
@@ -90,15 +150,26 @@
         bmr = 10 * weight + 6.25 * height - 5 * age - 161;
       }
 
-      // Total calorie needs
-      const totalCalories = bmr * activity;
-      document.getElementById('result').innerText = totalCalories.toFixed(2);
+      // Adjust for activity level
+      const tdee = bmr * activity;
 
-      // Macronutrient breakdown (example: 40% carbs, 30% protein, 30% fat)
-      const protein = (totalCalories * 0.3) / 4; // Protein in grams
-      const carbs = (totalCalories * 0.4) / 4;   // Carbs in grams
-      const fats = (totalCalories * 0.3) / 9;    // Fats in grams
+      // Adjust calories based on goal
+      let adjustedCalories = tdee;
+      if (goal === "fat_loss") adjustedCalories *= 0.8; // 20% calorie deficit
+      if (goal === "muscle_gain") adjustedCalories *= 1.15; // 15% calorie surplus
 
+      // Macro ratios (example: Precision Nutrition's general guidelines)
+      const proteinRatio = 0.3; // 30% of calories
+      const carbRatio = 0.4; // 40% of calories
+      const fatRatio = 0.3; // 30% of calories
+
+      // Convert calories to grams
+      const protein = (adjustedCalories * proteinRatio) / 4;
+      const carbs = (adjustedCalories * carbRatio) / 4;
+      const fats = (adjustedCalories * fatRatio) / 9;
+
+      // Display results
+      document.getElementById('result').innerText = adjustedCalories.toFixed(2);
       document.getElementById('macros').innerText = 
         `Protein: ${protein.toFixed(2)} g, Carbs: ${carbs.toFixed(2)} g, Fat: ${fats.toFixed(2)} g`;
     }
