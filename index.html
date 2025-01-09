@@ -41,7 +41,7 @@
     h1, h2 {
       text-align: center;
     }
-    #result, #macros {
+    #result, #macros, #weightLossResult {
       font-weight: bold;
       color: #2e8b57;
       margin-top: 20px;
@@ -99,12 +99,20 @@
       <option value="muscle_gain">Muscle Gain</option>
     </select>
 
+    <label for="weightLoss">Target Weight Loss:</label>
+    <input type="number" id="weightLoss" placeholder="Weight loss (lbs or kg)">
+
+    <label for="timePeriod">Time Period (days):</label>
+    <input type="number" id="timePeriod" placeholder="Days">
+
     <button type="button" onclick="calculate()">Calculate</button>
   </form>
 
   <h2>Calories: <span id="result">-</span> kcal/day</h2>
   <h2>Macronutrient Breakdown:</h2>
   <p id="macros">Protein: - g, Carbs: - g, Fat: - g</p>
+  <h2>Weight Loss Target:</h2>
+  <p id="weightLossResult">Daily Caloric Deficit: - kcal/day</p>
 
   <script>
     function toggleUnits() {
@@ -172,6 +180,19 @@
       document.getElementById('result').innerText = adjustedCalories.toFixed(2);
       document.getElementById('macros').innerText = 
         `Protein: ${protein.toFixed(2)} g, Carbs: ${carbs.toFixed(2)} g, Fat: ${fats.toFixed(2)} g`;
+
+      // Calculate weight loss deficit
+      const weightLoss = parseFloat(document.getElementById('weightLoss').value);
+      const timePeriod = parseInt(document.getElementById('timePeriod').value);
+
+      if (weightLoss && timePeriod) {
+        const totalDeficit = weightLoss * 7700; // 7700 kcal per kg or 3500 kcal per lb
+        const dailyDeficit = totalDeficit / timePeriod;
+
+        document.getElementById('weightLossResult').innerText = `Daily Caloric Deficit: ${dailyDeficit.toFixed(2)} kcal/day`;
+      } else {
+        document.getElementById('weightLossResult').innerText = "Daily Caloric Deficit: - kcal/day";
+      }
     }
   </script>
 </body>
