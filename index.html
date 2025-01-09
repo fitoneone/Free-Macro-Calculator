@@ -124,18 +124,27 @@
     </select>
 
     <label for="goal">Goal:</label>
-    <select id="goal" required>
+    <select id="goal" onchange="toggleGoalFields()" required>
       <option value="maintenance">Maintenance</option>
       <option value="fat_loss">Fat Loss</option>
       <option value="muscle_gain">Muscle Gain</option>
     </select>
 
-    <div class="section-header">Step 4: Set Weight Loss Goals</div>
-    <label for="weightLoss">Target Weight Loss:</label>
-    <input type="number" id="weightLoss" placeholder="Weight loss (lbs or kg)">
+    <div id="fat-loss-fields" style="display: none;">
+      <label for="weightLoss">Target Weight Loss:</label>
+      <input type="number" id="weightLoss" placeholder="Weight loss (lbs or kg)">
 
-    <label for="timePeriod">Time Period (days):</label>
-    <input type="number" id="timePeriod" placeholder="Days">
+      <label for="timePeriod">Time Period (days):</label>
+      <input type="number" id="timePeriod" placeholder="Days">
+    </div>
+
+    <div id="muscle-gain-fields" style="display: none;">
+      <label for="muscleGain">Target Muscle Gain:</label>
+      <input type="number" id="muscleGain" placeholder="Muscle gain (lbs or kg)">
+
+      <label for="gainTimePeriod">Time Period (days):</label>
+      <input type="number" id="gainTimePeriod" placeholder="Days">
+    </div>
 
     <button type="button" onclick="calculate()">Calculate</button>
     <p id="error-message" style="display: none;">Please fill out all fields correctly.</p>
@@ -148,8 +157,8 @@
   <p id="macros">Protein: - g, Carbs: - g, Fat: - g</p>
   <p id="macro-explanation">Your macronutrient split is designed for optimal results based on your goal.</p>
 
-  <h2>Weight Loss Target:</h2>
-  <p id="weightLossResult">Daily Caloric Deficit: - kcal/day</p>
+  <h2>Weight Loss or Muscle Gain Target:</h2>
+  <p id="weightLossResult">Daily Caloric Adjustment: - kcal/day</p>
 
   <script>
     function toggleUnits() {
@@ -163,6 +172,23 @@
       } else {
         metricInputs.style.display = 'none';
         imperialInputs.style.display = 'block';
+      }
+    }
+
+    function toggleGoalFields() {
+      const goal = document.getElementById('goal').value;
+      const fatLossFields = document.getElementById('fat-loss-fields');
+      const muscleGainFields = document.getElementById('muscle-gain-fields');
+
+      if (goal === 'fat_loss') {
+        fatLossFields.style.display = 'block';
+        muscleGainFields.style.display = 'none';
+      } else if (goal === 'muscle_gain') {
+        fatLossFields.style.display = 'none';
+        muscleGainFields.style.display = 'block';
+      } else {
+        fatLossFields.style.display = 'none';
+        muscleGainFields.style.display = 'none';
       }
     }
 
@@ -207,8 +233,25 @@
 
       // Adjust calories based on goal
       let adjustedCalories = tdee;
-      if (goal === "fat_loss") adjustedCalories *= 0.8; // 20% calorie deficit
-      if (goal === "muscle_gain") adjustedCalories *= 1.15; // 15% calorie surplus
+      let dailyAdjustment = 0;
+
+      if (goal === "fat_loss") {
+        const weightLoss = parseFloat(document.getElementById('weightLoss').value);
+        const timePeriod = parseInt(document.getElementById('timePeriod').value);
+        if (weightLoss && timePeriod) {
+          const totalDeficit = weightLoss * 7700; // 7700 kcal per kg or 3500 kcal per lb
+          dailyAdjustment = totalDeficit / timePeriod;
+          adjustedCalories -= dailyAdjustment;
+        }
+      } else if (goal === "muscle_gain") {
+        const muscleGain = parseFloat(document.getElementById('muscleGain').value);
+        const gainTimePeriod = parseInt(document.getElementById('gainTimePeriod').value);
+        if (muscleGain && gainTimePeriod) {
+          const totalSurplus = muscleGain * 7700; // 7700 kcal per kg or 3500 kcal per lb
+          dailyAdjustment = totalSurplus / gainTimePeriod;
+          adjustedCalories += dailyAdjustment;
+        }
+      }
 
       // Macro ratios (example: Precision Nutrition's general guidelines)
       const proteinRatio = 0.3; // 30% of calories
@@ -225,23 +268,12 @@
       document.getElementById('macros').innerText = 
         `Protein: ${protein.toFixed(2)} g, Carbs: ${carbs.toFixed(2)} g, Fat: ${fats.toFixed(2)} g`;
 
-      // Calculate weight loss deficit
-      const weightLoss = parseFloat(document.getElementById('weightLoss').value);
-      const timePeriod = parseInt(document.getElementById('timePeriod').value);
-
-      if (weightLoss && timePeriod) {
-        const totalDeficit = weightLoss * 7700; // 7700 kcal per kg or 3500 kcal per lb
-        const dailyDeficit = totalDeficit / timePeriod;
-
-        document.getElementById('weightLossResult').innerText = `Daily Caloric Deficit: ${dailyDeficit.toFixed(2)} kcal/day`;
-      } else {
-        document.getElementById('weightLossResult').innerText = "Daily Caloric Deficit: - kcal/day";
-      }
+      document.getElementById('weightLossResult').innerText = `Daily Caloric Adjustment: ${dailyAdjustment.toFixed(2)} kcal/day`;
     }
   </script>
 
   <footer>
-    &copy; 2025 Your Brand. All rights reserved.
+    &copy; 2025 FIT ONEONE TRAINING INC. All rights reserved.
   </footer>
 </body>
 </html>
