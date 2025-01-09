@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>FIT OneOne Training Calorie & Macro Calculator</title>
+  <title>Calorie & Macro Calculator</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Saira+Extra+Condensed:wght@400&display=swap');
+
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Saira Extra Condensed', Arial, sans-serif;
       margin: 20px;
-      background-color: #f7f9fc;
+      background-color: #ffffff;
       color: #333;
     }
     form {
@@ -29,28 +31,55 @@
       border-radius: 5px;
     }
     button {
-      background-color: #4CAF50;
+      background-color: #004cae;
       color: white;
       font-weight: bold;
       border: none;
       cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.2s ease;
     }
     button:hover {
-      background-color: #45a049;
+      background-color: #003b88;
+      transform: scale(1.05);
     }
     h1, h2 {
       text-align: center;
+      color: #004cae;
     }
     #result, #macros, #weightLossResult {
       font-weight: bold;
-      color: #2e8b57;
+      color: #004cae;
       margin-top: 20px;
+    }
+    #error-message {
+      color: #ff4f1b;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .section-header {
+      color: #004cae;
+      font-size: 1.2em;
+      margin-top: 20px;
+      border-bottom: 2px solid #ff4f1b;
+      padding-bottom: 5px;
+    }
+    input:focus, select:focus {
+      border-color: #004cae;
+      box-shadow: 0 0 5px rgba(0, 76, 174, 0.5);
+      outline: none;
+    }
+    footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.9em;
+      color: #666;
     }
   </style>
 </head>
 <body>
   <h1>Calorie & Macro Calculator</h1>
   <form id="calorieForm">
+    <div class="section-header">Step 1: Choose Units</div>
     <label for="units">Units:</label>
     <select id="units" onchange="toggleUnits()" required>
       <option value="metric">Metric (kg, cm)</option>
@@ -74,6 +103,7 @@
       <input type="number" id="heightInches" placeholder="Inches" step="0.1">
     </div>
 
+    <div class="section-header">Step 2: Enter Personal Details</div>
     <label for="age">Age (years):</label>
     <input type="number" id="age" required>
 
@@ -83,6 +113,7 @@
       <option value="female">Female</option>
     </select>
 
+    <div class="section-header">Step 3: Choose Activity & Goals</div>
     <label for="activity">Activity Level:</label>
     <select id="activity" required>
       <option value="1.2">Sedentary</option>
@@ -99,6 +130,7 @@
       <option value="muscle_gain">Muscle Gain</option>
     </select>
 
+    <div class="section-header">Step 4: Set Weight Loss Goals</div>
     <label for="weightLoss">Target Weight Loss:</label>
     <input type="number" id="weightLoss" placeholder="Weight loss (lbs or kg)">
 
@@ -106,11 +138,16 @@
     <input type="number" id="timePeriod" placeholder="Days">
 
     <button type="button" onclick="calculate()">Calculate</button>
+    <p id="error-message" style="display: none;">Please fill out all fields correctly.</p>
   </form>
 
   <h2>Calories: <span id="result">-</span> kcal/day</h2>
+  <p id="explanation">This calorie target is calculated based on your selected goal and activity level.</p>
+
   <h2>Macronutrient Breakdown:</h2>
   <p id="macros">Protein: - g, Carbs: - g, Fat: - g</p>
+  <p id="macro-explanation">Your macronutrient split is designed for optimal results based on your goal.</p>
+
   <h2>Weight Loss Target:</h2>
   <p id="weightLossResult">Daily Caloric Deficit: - kcal/day</p>
 
@@ -149,6 +186,13 @@
       const gender = document.getElementById('gender').value;
       const activity = parseFloat(document.getElementById('activity').value);
       const goal = document.getElementById('goal').value;
+
+      if (!weight || !height || !age || !activity || !goal) {
+        document.getElementById('error-message').style.display = 'block';
+        return;
+      } else {
+        document.getElementById('error-message').style.display = 'none';
+      }
 
       // Calculate BMR
       let bmr;
@@ -195,5 +239,9 @@
       }
     }
   </script>
+
+  <footer>
+    &copy; 2025 Your Brand. All rights reserved.
+  </footer>
 </body>
 </html>
