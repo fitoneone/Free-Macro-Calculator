@@ -87,18 +87,18 @@
     </select>
 
     <div id="metric-inputs">
-      <label for="weight">Weight (kg):</label>
+      <label for="weightMetric">Weight (kg):</label>
       <input type="number" id="weightMetric" step="0.1">
 
-      <label for="height">Height (cm):</label>
+      <label for="heightMetric">Height (cm):</label>
       <input type="number" id="heightMetric" step="0.1">
     </div>
 
     <div id="imperial-inputs" style="display: none;">
-      <label for="weight">Weight (lbs):</label>
+      <label for="weightImperial">Weight (lbs):</label>
       <input type="number" id="weightImperial" step="0.1">
 
-      <label for="height">Height:</label>
+      <label for="heightFeet">Height:</label>
       <input type="number" id="heightFeet" placeholder="Feet" step="1">
       <input type="number" id="heightInches" placeholder="Inches" step="0.1">
     </div>
@@ -174,6 +174,13 @@
         metricInputs.style.display = 'none';
         imperialInputs.style.display = 'block';
       }
+
+      // Clear the inputs when switching units
+      document.getElementById('weightMetric').value = '';
+      document.getElementById('heightMetric').value = '';
+      document.getElementById('weightImperial').value = '';
+      document.getElementById('heightFeet').value = '';
+      document.getElementById('heightInches').value = '';
     }
 
     function toggleGoalFields() {
@@ -250,15 +257,4 @@
             recommendation.style.display = 'block';
             recommendation.innerText = 'For sustainable weight loss, we recommend staying within 0.5 to 2 lbs per week.';
           } else {
-            recommendation.style.display = 'none';
-          }
-        }
-      } else if (goal === "muscle_gain") {
-        const muscleGain = parseFloat(document.getElementById('muscleGain').value);
-        const gainTimePeriod = parseInt(document.getElementById('gainTimePeriod').value);
-        if (muscleGain && gainTimePeriod) {
-          const totalSurplus = muscleGain * 7700; // 7700 kcal per kg or 3500 kcal per lb
-          dailyAdjustment = totalSurplus / gainTimePeriod;
-          adjustedCalories += dailyAdjustment;
-
-          const weeklyGain = (muscleGain / (gainTimePeriod / 7));
+            recommendation.style.display =
