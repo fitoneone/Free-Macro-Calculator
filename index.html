@@ -46,7 +46,7 @@
       text-align: center;
       color: #004cae;
     }
-    #result, #macros, #weightLossResult {
+    #result, #macros, #weightLossResult, #recommendation {
       font-weight: bold;
       color: #004cae;
       margin-top: 20px;
@@ -159,6 +159,7 @@
 
   <h2>Weight Loss or Muscle Gain Target:</h2>
   <p id="weightLossResult">Daily Caloric Adjustment: - kcal/day</p>
+  <p id="recommendation" style="display: none; color: #ff4f1b;"></p>
 
   <script>
     function toggleUnits() {
@@ -234,6 +235,7 @@
       // Adjust calories based on goal
       let adjustedCalories = tdee;
       let dailyAdjustment = 0;
+      const recommendation = document.getElementById('recommendation');
 
       if (goal === "fat_loss") {
         const weightLoss = parseFloat(document.getElementById('weightLoss').value);
@@ -242,6 +244,14 @@
           const totalDeficit = weightLoss * 7700; // 7700 kcal per kg or 3500 kcal per lb
           dailyAdjustment = totalDeficit / timePeriod;
           adjustedCalories -= dailyAdjustment;
+
+          const weeklyLoss = (weightLoss / (timePeriod / 7));
+          if (weeklyLoss < 0.5 || weeklyLoss > 2) {
+            recommendation.style.display = 'block';
+            recommendation.innerText = 'For sustainable weight loss, we recommend staying within 0.5 to 2 lbs per week.';
+          } else {
+            recommendation.style.display = 'none';
+          }
         }
       } else if (goal === "muscle_gain") {
         const muscleGain = parseFloat(document.getElementById('muscleGain').value);
@@ -250,30 +260,5 @@
           const totalSurplus = muscleGain * 7700; // 7700 kcal per kg or 3500 kcal per lb
           dailyAdjustment = totalSurplus / gainTimePeriod;
           adjustedCalories += dailyAdjustment;
-        }
-      }
 
-      // Macro ratios (example: Precision Nutrition's general guidelines)
-      const proteinRatio = 0.3; // 30% of calories
-      const carbRatio = 0.4; // 40% of calories
-      const fatRatio = 0.3; // 30% of calories
-
-      // Convert calories to grams
-      const protein = (adjustedCalories * proteinRatio) / 4;
-      const carbs = (adjustedCalories * carbRatio) / 4;
-      const fats = (adjustedCalories * fatRatio) / 9;
-
-      // Display results
-      document.getElementById('result').innerText = adjustedCalories.toFixed(2);
-      document.getElementById('macros').innerText = 
-        `Protein: ${protein.toFixed(2)} g, Carbs: ${carbs.toFixed(2)} g, Fat: ${fats.toFixed(2)} g`;
-
-      document.getElementById('weightLossResult').innerText = `Daily Caloric Adjustment: ${dailyAdjustment.toFixed(2)} kcal/day`;
-    }
-  </script>
-
-  <footer>
-    &copy; 2025 FIT ONEONE TRAINING INC. All rights reserved.
-  </footer>
-</body>
-</html>
+          const weeklyGain = (muscleGain / (gainTimePeriod / 7));
