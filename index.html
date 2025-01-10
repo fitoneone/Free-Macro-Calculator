@@ -87,18 +87,18 @@
     </select>
 
     <div id="metric-inputs">
-      <label for="weight">Weight (kg):</label>
+      <label for="weightMetric">Weight (kg):</label>
       <input type="number" id="weightMetric" step="0.1">
 
-      <label for="height">Height (cm):</label>
+      <label for="heightMetric">Height (cm):</label>
       <input type="number" id="heightMetric" step="0.1">
     </div>
 
     <div id="imperial-inputs" style="display: none;">
-      <label for="weight">Weight (lbs):</label>
+      <label for="weightImperial">Weight (lbs):</label>
       <input type="number" id="weightImperial" step="0.1">
 
-      <label for="height">Height:</label>
+      <label for="heightFeet">Height:</label>
       <input type="number" id="heightFeet" placeholder="Feet" step="1">
       <input type="number" id="heightInches" placeholder="Inches" step="0.1">
     </div>
@@ -166,6 +166,7 @@
       const metricInputs = document.getElementById('metric-inputs');
       const imperialInputs = document.getElementById('imperial-inputs');
 
+      // Show or hide inputs based on selected unit
       if (units === 'metric') {
         metricInputs.style.display = 'block';
         imperialInputs.style.display = 'none';
@@ -173,6 +174,13 @@
         metricInputs.style.display = 'none';
         imperialInputs.style.display = 'block';
       }
+
+      // Clear values in hidden inputs to prevent calculation errors
+      document.getElementById('weightMetric').value = '';
+      document.getElementById('heightMetric').value = '';
+      document.getElementById('weightImperial').value = '';
+      document.getElementById('heightFeet').value = '';
+      document.getElementById('heightInches').value = '';
     }
 
     function toggleGoalFields() {
@@ -180,6 +188,7 @@
       const fatLossFields = document.getElementById('fat-loss-fields');
       const muscleGainFields = document.getElementById('muscle-gain-fields');
 
+      // Show or hide inputs based on selected goal
       if (goal === 'fat_loss') {
         fatLossFields.style.display = 'block';
         muscleGainFields.style.display = 'none';
@@ -200,4 +209,13 @@
         weight = parseFloat(document.getElementById('weightMetric').value);
         height = parseFloat(document.getElementById('heightMetric').value);
       } else {
-        const weightImperial = parseFloat(document.getElementById('weightImper
+        const weightImperial = parseFloat(document.getElementById('weightImperial').value);
+        const heightFeet = parseFloat(document.getElementById('heightFeet').value);
+        const heightInches = parseFloat(document.getElementById('heightInches').value);
+
+        weight = weightImperial * 0.453592; // Convert lbs to kg
+        height = (heightFeet * 30.48) + (heightInches * 2.54); // Convert ft/in to cm
+      }
+
+      const age = parseInt(document.getElementById('age').value);
+      const gender = document.getElementBy
