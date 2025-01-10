@@ -132,7 +132,7 @@
 
     <div id="fat-loss-fields" style="display: none;">
       <label for="weightLoss">Target Weight Loss:</label>
-      <input type="number" id="weightLoss" placeholder="Weight loss (lbs or kg)">
+      <input type="number" id="weightLoss" placeholder="Weight loss">
 
       <label for="timePeriod">Time Period (days):</label>
       <input type="number" id="timePeriod" placeholder="Days">
@@ -140,7 +140,7 @@
 
     <div id="muscle-gain-fields" style="display: none;">
       <label for="muscleGain">Target Muscle Gain:</label>
-      <input type="number" id="muscleGain" placeholder="Muscle gain (lbs or kg)">
+      <input type="number" id="muscleGain" placeholder="Muscle gain">
 
       <label for="gainTimePeriod">Time Period (days):</label>
       <input type="number" id="gainTimePeriod" placeholder="Days">
@@ -170,9 +170,13 @@
       if (units === 'metric') {
         metricInputs.style.display = 'block';
         imperialInputs.style.display = 'none';
+        document.getElementById('weightLoss').placeholder = "Weight loss (kg)";
+        document.getElementById('muscleGain').placeholder = "Muscle gain (kg)";
       } else {
         metricInputs.style.display = 'none';
         imperialInputs.style.display = 'block';
+        document.getElementById('weightLoss').placeholder = "Weight loss (lbs)";
+        document.getElementById('muscleGain').placeholder = "Muscle gain (lbs)";
       }
     }
 
