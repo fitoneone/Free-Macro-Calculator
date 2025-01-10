@@ -46,7 +46,7 @@
       text-align: center;
       color: #004cae;
     }
-    #result, #macros, #weightLossResult, #recommendation {
+    #result, #macros, #weightLossResult {
       font-weight: bold;
       color: #004cae;
       margin-top: 20px;
@@ -87,18 +87,18 @@
     </select>
 
     <div id="metric-inputs">
-      <label for="weightMetric">Weight (kg):</label>
+      <label for="weight">Weight (kg):</label>
       <input type="number" id="weightMetric" step="0.1">
 
-      <label for="heightMetric">Height (cm):</label>
+      <label for="height">Height (cm):</label>
       <input type="number" id="heightMetric" step="0.1">
     </div>
 
     <div id="imperial-inputs" style="display: none;">
-      <label for="weightImperial">Weight (lbs):</label>
+      <label for="weight">Weight (lbs):</label>
       <input type="number" id="weightImperial" step="0.1">
 
-      <label for="heightFeet">Height:</label>
+      <label for="height">Height:</label>
       <input type="number" id="heightFeet" placeholder="Feet" step="1">
       <input type="number" id="heightInches" placeholder="Inches" step="0.1">
     </div>
@@ -159,7 +159,6 @@
 
   <h2>Weight Loss or Muscle Gain Target:</h2>
   <p id="weightLossResult">Daily Caloric Adjustment: - kcal/day</p>
-  <p id="recommendation" style="display: none; color: #ff4f1b;"></p>
 
   <script>
     function toggleUnits() {
@@ -174,13 +173,6 @@
         metricInputs.style.display = 'none';
         imperialInputs.style.display = 'block';
       }
-
-      // Clear the inputs when switching units
-      document.getElementById('weightMetric').value = '';
-      document.getElementById('heightMetric').value = '';
-      document.getElementById('weightImperial').value = '';
-      document.getElementById('heightFeet').value = '';
-      document.getElementById('heightInches').value = '';
     }
 
     function toggleGoalFields() {
@@ -208,53 +200,4 @@
         weight = parseFloat(document.getElementById('weightMetric').value);
         height = parseFloat(document.getElementById('heightMetric').value);
       } else {
-        const weightImperial = parseFloat(document.getElementById('weightImperial').value);
-        const heightFeet = parseFloat(document.getElementById('heightFeet').value);
-        const heightInches = parseFloat(document.getElementById('heightInches').value);
-
-        weight = weightImperial * 0.453592; // Convert lbs to kg
-        height = (heightFeet * 30.48) + (heightInches * 2.54); // Convert ft/in to cm
-      }
-
-      const age = parseInt(document.getElementById('age').value);
-      const gender = document.getElementById('gender').value;
-      const activity = parseFloat(document.getElementById('activity').value);
-      const goal = document.getElementById('goal').value;
-
-      if (!weight || !height || !age || !activity || !goal) {
-        document.getElementById('error-message').style.display = 'block';
-        return;
-      } else {
-        document.getElementById('error-message').style.display = 'none';
-      }
-
-      // Calculate BMR
-      let bmr;
-      if (gender === "male") {
-        bmr = 10 * weight + 6.25 * height - 5 * age + 5;
-      } else {
-        bmr = 10 * weight + 6.25 * height - 5 * age - 161;
-      }
-
-      // Adjust for activity level
-      const tdee = bmr * activity;
-
-      // Adjust calories based on goal
-      let adjustedCalories = tdee;
-      let dailyAdjustment = 0;
-      const recommendation = document.getElementById('recommendation');
-
-      if (goal === "fat_loss") {
-        const weightLoss = parseFloat(document.getElementById('weightLoss').value);
-        const timePeriod = parseInt(document.getElementById('timePeriod').value);
-        if (weightLoss && timePeriod) {
-          const totalDeficit = weightLoss * 7700; // 7700 kcal per kg or 3500 kcal per lb
-          dailyAdjustment = totalDeficit / timePeriod;
-          adjustedCalories -= dailyAdjustment;
-
-          const weeklyLoss = (weightLoss / (timePeriod / 7));
-          if (weeklyLoss < 0.5 || weeklyLoss > 2) {
-            recommendation.style.display = 'block';
-            recommendation.innerText = 'For sustainable weight loss, we recommend staying within 0.5 to 2 lbs per week.';
-          } else {
-            recommendation.style.display =
+        const weightImperial = parseFloat(document.getElementById('weightImper
