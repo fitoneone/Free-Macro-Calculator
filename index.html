@@ -174,13 +174,6 @@
         metricInputs.style.display = 'none';
         imperialInputs.style.display = 'block';
       }
-
-      // Clear values in hidden inputs to prevent calculation errors
-      document.getElementById('weightMetric').value = '';
-      document.getElementById('heightMetric').value = '';
-      document.getElementById('weightImperial').value = '';
-      document.getElementById('heightFeet').value = '';
-      document.getElementById('heightInches').value = '';
     }
 
     function toggleGoalFields() {
@@ -218,4 +211,66 @@
       }
 
       const age = parseInt(document.getElementById('age').value);
-      const gender = document.getElementBy
+      const gender = document.getElementById('gender').value;
+      const activity = parseFloat(document.getElementById('activity').value);
+      const goal = document.getElementById('goal').value;
+
+      if (!weight || !height || !age || !activity || !goal) {
+        document.getElementById('error-message').style.display = 'block';
+        return;
+      } else {
+        document.getElementById('error-message').style.display = 'none';
+      }
+
+      // Calculate BMR
+      let bmr;
+      if (gender === "male") {
+        bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+      } else {
+        bmr = 10 * weight + 6.25 * height - 5 * age - 161;
+      }
+
+      // Adjust for activity level
+      const tdee = bmr * activity;
+
+      // Adjust calories based on goal
+      let adjustedCalories = tdee;
+
+      if (goal === "fat_loss") {
+        const weightLoss = parseFloat(document.getElementById('weightLoss').value);
+        const timePeriod = parseInt(document.getElementById('timePeriod').value);
+        if (weightLoss && timePeriod) {
+          const totalDeficit = weightLoss * 7700; // 7700 kcal per kg or 3500 kcal per lb
+          const dailyDeficit = totalDeficit / timePeriod;
+          adjustedCalories -= dailyDeficit;
+        }
+      } else if (goal === "muscle_gain") {
+        const muscleGain = parseFloat(document.getElementById('muscleGain').value);
+        const gainTimePeriod = parseInt(document.getElementById('gainTimePeriod').value);
+        if (muscleGain && gainTimePeriod) {
+          const totalSurplus = muscleGain * 7700; // 7700 kcal per kg or 3500 kcal per lb
+          const dailySurplus = totalSurplus / gainTimePeriod;
+          adjustedCalories += dailySurplus;
+        }
+      }
+
+      // Macro ratios (example: 30% Protein, 40% Carbs, 30% Fat)
+      const proteinRatio = 0.3;
+      const carbRatio = 0.4;
+      const fatRatio = 0.3;
+
+      const protein = (adjustedCalories * proteinRatio) / 4;
+      const carbs = (adjustedCalories * carbRatio) / 4;
+      const fats = (adjustedCalories * fatRatio) / 9;
+
+      document.getElementById('result').innerText = adjustedCalories.toFixed(2);
+      document.getElementById('macros').innerText = 
+        `Protein: ${protein.toFixed(2)} g, Carbs: ${carbs.toFixed(2)} g, Fat: ${fats.toFixed(2)} g`;
+    }
+  </script>
+
+  <footer>
+    &copy; 2025 Your Brand. All rights reserved.
+  </footer>
+</body>
+</html>
